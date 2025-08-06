@@ -19,8 +19,26 @@ const Index = () => {
     
     setIsGenerating(true);
     
-    // Simulate AI generation
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/generate-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ topic }),
+      });
+
+      if (!response.ok) {
+        throw new Error('AI content generation failed');
+      }
+
+      const data = await response.json();
+      setHashtags(data.hashtags);
+      setDescription(data.description);
+      setShowAIContent(true);
+    } catch (error) {
+      console.error('Error generating content:', error);
+      // Fallback to mock data
       const generatedHashtags = [
         "#viral", "#keşfet", "#trend", "#video", "#content",
         "#socialMedia", "#instagram", "#tiktok", "#youtube", "#share",
@@ -40,8 +58,9 @@ Bu harika videoyu sizler için hazırladık! Beğenmeyi ve paylaşmayı unutmay�
       setHashtags(generatedHashtags);
       setDescription(generatedDescription);
       setShowAIContent(true);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const regenerateContent = () => {
